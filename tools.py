@@ -5,6 +5,7 @@ import time
 import requests
 import math
 import os
+import pandas as pd
 
 SESSION_THREAD_LOCAL = threading.local()
 
@@ -115,7 +116,10 @@ def validate_int(src):
 
 def validate_date_read(src):
     if src is not None:
-        return src
+        if isinstance(src, str):
+            return pd.to_datetime(src)
+        else:
+            return src
     return None
 
 

@@ -11,7 +11,7 @@ BUILDING_PERMITS = pd.read_csv(
     "downloads/Building_Permits.csv",
     sep=',',
     infer_datetime_format=True,
-    parse_dates=['Permit Creation Date', 'Current Status Date'],
+    parse_dates=['Permit Creation Date', 'Status Date'],
     dtype={
         'Permit Number': str
     })
@@ -59,13 +59,18 @@ def upload_batch(batch: tools.BatchBuilder):
         batch.copy_string('Proposed Use', 'proposedUse')
 
         # Street Info
-        street = {
-            "streetName": batch.read_string('Street Name'),
-            "streetNameSuffix": batch.read_string('Street Suffix'),
-            "streetNumber": batch.read_int('Street Number'),
-            "streetNumberSuffix": batch.read_string('Street Number Suffix')
-        }
-        batch.write_value('street', street)
+        streetName = batch.read_string('Street Name')
+        streetNameSuffix = batch.read_string('Street Suffix')
+        streetNumber = batch.read_int('Street Number')
+        streetNumberSuffix = batch.read_string('Street Number Suffix')
+        if streetNumber is not None and streetName is not None:
+            street = {
+                "streetName": streetName,
+                "streetNameSuffix": streetNameSuffix,
+                "streetNumber": streetNumber,
+                "streetNumberSuffix": streetNumberSuffix
+            }
+            batch.write_value('street', street)
 
         # Statistics
         batch.copy_int('Number of Existing Stories', 'existingStories')
@@ -85,8 +90,10 @@ def upload_batch(batch: tools.BatchBuilder):
             print("Wrong Type: {}".format(permit_type))
 
         # Permit Status
-        status = batch.read_string('Current Status')
-        status_date = batch.read_date('Current Status Date')
+        status = batch.read_string('Status')
+        status_date = None
+        # status_date = batch.read_date('Status Date')
+        # print(type(status_date))
         if status in _status_map:
             batch.write_string('status', _status_map[status])
             batch.write_date('statusUpdatedAt', status_date)
