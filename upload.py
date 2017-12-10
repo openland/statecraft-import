@@ -11,7 +11,7 @@ BUILDING_PERMITS = pd.read_csv(
     "downloads/Building_Permits.csv",
     sep=',',
     infer_datetime_format=True,
-    parse_dates=['Permit Creation Date', 'Status Date'],
+    parse_dates=['Permit Creation Date', 'Current Status Date'],
     dtype={
         'Permit Number': str
     })
@@ -90,9 +90,9 @@ def upload_batch(batch: tools.BatchBuilder):
             print("Wrong Type: {}".format(permit_type))
 
         # Permit Status
-        status = batch.read_string('Status')
-        status_date = None
-        # status_date = batch.read_date('Status Date')
+        status = batch.read_string('Current Status')
+        # status_date = None
+        status_date = batch.read_date('Current Status Date')
         # print(type(status_date))
         if status in _status_map:
             batch.write_string('status', _status_map[status])
