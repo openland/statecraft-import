@@ -100,4 +100,4 @@ def upload_batch(batch: tools.BatchBuilder):
     tools.upload_permits(batch.data)
 
 
-tools.batch_process(BUILDING_PERMITS, upload_batch)
+tools.batch_process(BUILDING_PERMITS, upload_batch, max_workers=8)
