@@ -6,8 +6,6 @@ import time
 import math
 import tools
 
-tools.SERVER = "local"
-
 print("Loading Permits...")
 BUILDING_PERMITS = pd.read_csv(
     "downloads/Building_Permits.csv",
