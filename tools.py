@@ -51,6 +51,14 @@ def upload_permits(permits):
     data = json.dumps(container)
     response = SESSION_THREAD_LOCAL.s.post(
         url, data=data, headers=headers, stream=False)
+    rdata = json.loads(response.text)
+    if rdata['data']['updatePermits'] != 'ok':
+        print("Wrong Response!")
+        print("Sent:")
+        print(data)
+        print("Got:")
+        print(response.text)
+        raise Exception("Wrong response!")
     #    print(r.text)
     end = time.time()
     return end - start
