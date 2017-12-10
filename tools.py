@@ -8,6 +8,8 @@ import os
 
 SESSION_THREAD_LOCAL = threading.local()
 
+print("Env: {}".format(os.environ['UPLOAD_SERVER']))
+
 SERVER = "prod"
 if 'UPLOAD_SERVER' in os.environ:
     SERVER = os.environ['UPLOAD_SERVER']
