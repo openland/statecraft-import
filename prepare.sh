@@ -2,5 +2,5 @@
 set -e
 apt-get update -y
 apt-get install -y python3 wget curl python3-pip
-python3 -m pip install quilt
+pip3 install quilt
 rm -fr tmp
