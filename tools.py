@@ -4,10 +4,13 @@ import threading
 import time
 import requests
 import math
+import os
 
 SESSION_THREAD_LOCAL = threading.local()
 
 SERVER = "prod"
+if os.environ['UPLOAD_SERVER'] is not None:
+    SERVER = os.environ['UPLOAD_SERVER']
 
 
 def upload_permits(permits):
@@ -19,12 +22,15 @@ def upload_permits(permits):
     staging_url = "https://statecraft-api-staging.herokuapp.com/api"
     production_url = "https://statecraft-api.herokuapp.com/api"
     local_url = "http://localhost:9000/api"
+    local_docker_url = "http://docker.for.mac.localhost:9000/api"
 
     if SERVER == "prod":
         url = production_url
     elif SERVER == "staging":
         url = staging_url
         domain = "sfhousing"
+    elif SERVER == "docker":
+        url = local_docker_url
     else:
         url = local_url
 
@@ -97,7 +103,7 @@ def validate_int(src):
 
 
 def validate_date_read(src):
-    if srs is not None:
+    if src is not None:
         return src
     return None
 
