@@ -1,3 +1,4 @@
 #!/bin/sh
-apt-get update
-apt-get install python3 wget curl
+set -e
+apt-get update -y
+apt-get install -y python3 wget curl
