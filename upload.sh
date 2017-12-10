@@ -1,3 +1,3 @@
 #!/bin/sh
 set -e
-python3 upload.py
+python3 -u upload.py

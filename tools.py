@@ -63,23 +63,32 @@ def batch_process_iter(dataset, offset, batch_size, processor):
     return time.time() - start
 
 
-def batch_process(dataset, processor, max_workers=8, batch_size=200, limit=-1):
+def batch_process(dataset, processor, max_workers=1, batch_size=200, limit=-1):
     iterations = math.ceil(len(dataset) / 200)
     if limit >= 0:
         iterations = min(limit, iterations)
     start = time.time()
-    with concurrent.futures.ThreadPoolExecutor(
-            max_workers=max_workers) as executor:
-        pendings = []
+    if max_workers == 1:
         for i in range(0, iterations):
-            pendings.append(
-                executor.submit(batch_process_iter, dataset, i * batch_size,
-                                batch_size, processor))
-        for i in range(0, iterations):
-            res = pendings[i].result()
+            res = batch_process_iter(dataset, i * batch_size, batch_size,
+                                     processor)
             speed = int((time.time() - start) * 1000) / (i + 1) / 1000.0 / 60.0
             print("Iteration {}/{} in {} remaining {}".format(
                 i, iterations, res, (iterations - i) * speed))
+    else:
+        with concurrent.futures.ThreadPoolExecutor(
+                max_workers=max_workers) as executor:
+            pendings = []
+            for i in range(0, iterations):
+                pendings.append(
+                    executor.submit(batch_process_iter, dataset,
+                                    i * batch_size, batch_size, processor))
+            for i in range(0, iterations):
+                res = pendings[i].result()
+                speed = int(
+                    (time.time() - start) * 1000) / (i + 1) / 1000.0 / 60.0
+                print("Iteration {}/{} in {} remaining {}".format(
+                    i, iterations, res, (iterations - i) * speed))
     print("Completed in {}".format(time.time() - start))
 
 
@@ -107,10 +116,12 @@ def validate_date_read(src):
         return src
     return None
 
+
 def validate_date_write(src):
     if src is not None:
         return src.strftime('%Y-%m-%d')
     return None
+
 
 class BatchBuilder:
     def __init__(self, source):
@@ -140,7 +151,7 @@ class BatchBuilder:
     def read_date(self, src):
         return validate_date_read(self.read_value(src))
 
-    def write_date(self,dst,value):
+    def write_date(self, dst, value):
         self.write_value(dst, validate_date_write(value))
 
     def copy_date(self, src, dst):
@@ -153,7 +164,8 @@ class BatchBuilder:
         self.current_row[dst] = value
 
     def next_record(self):
-        self.data.append(self.current_row)
-        self.current_row = {}
+        if self.index >= 0:
+            self.data.append(self.current_row)
+            self.current_row = {}
         self.index += 1
         return self.index < len(self.source)

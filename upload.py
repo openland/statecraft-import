@@ -13,7 +13,10 @@ BUILDING_PERMITS = pd.read_csv(
     "downloads/Building_Permits.csv",
     sep=',',
     infer_datetime_format=True,
-    parse_dates=['Permit Creation Date', 'Current Status Date'])
+    parse_dates=['Permit Creation Date', 'Current Status Date'],
+    dtype={
+        'Permit Number': str
+    })
 
 print("Uploading Permits...")
 
@@ -46,6 +49,7 @@ _status_map['upheld'] = 'UPHELD'
 _status_map['incomplete'] = 'INCOMPLETE'
 _status_map['granted'] = 'GRANTED'
 _status_map['cancelled'] = 'CANCELLED'
+_status_map['suspend'] = 'SUSPENDED'
 
 
 def upload_batch(batch: tools.BatchBuilder):
@@ -57,12 +61,13 @@ def upload_batch(batch: tools.BatchBuilder):
         batch.copy_string('Proposed Use', 'proposedUse')
 
         # Street Info
-        batch.write_value(
-            'street', {
-                "streetName": batch.read_string('Street Name'),
-                "streetNameSuffix": batch.read_string('Street Suffix'),
-                "streetNumber": batch.read_string('Street Number')
-            })
+        street = {
+            "streetName": batch.read_string('Street Name'),
+            "streetNameSuffix": batch.read_string('Street Suffix'),
+            "streetNumber": batch.read_int('Street Number'),
+            "streetNumberSuffix": batch.read_string('Street Number Suffix')
+        }
+        batch.write_value('street', street)
 
         # Statistics
         batch.copy_int('Number of Existing Stories', 'existingStories')
@@ -72,23 +77,27 @@ def upload_batch(batch: tools.BatchBuilder):
 
         # Permit Type
         permit_type = batch.read_int('Permit Type')
-        if _permit_type_map[permit_type] is not None:
+        if permit_type in _permit_type_map:
             batch.write_string('type', _permit_type_map[permit_type])
             if permit_type == 1:
                 batch.write_value('typeWood', False)
             elif permit_type == 2:
                 batch.write_value('typeWood', True)
+        else:
+            print("Wrong Type: {}".format(permit_type))
 
         # Permit Status
         status = batch.read_string('Current Status')
         status_date = batch.read_date('Current Status Date')
-        if _status_map[status] is not None:
+        if status in _status_map:
             batch.write_string('status', _status_map[status])
             batch.write_date('statusUpdatedAt', status_date)
             if (status == 'expired'):
                 batch.write_date('expiredAt', status_date)
             elif (status == 'issued'):
                 batch.write_date('issuedAt', status_date)
+        else:
+            print("Wrong Status: {}".format(status))
 
     tools.upload_permits(batch.data)
 
