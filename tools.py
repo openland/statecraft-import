@@ -9,7 +9,7 @@ import os
 SESSION_THREAD_LOCAL = threading.local()
 
 SERVER = "prod"
-if os.environ['UPLOAD_SERVER'] is not None:
+if 'UPLOAD_SERVER' in os.environ:
     SERVER = os.environ['UPLOAD_SERVER']
 
 
