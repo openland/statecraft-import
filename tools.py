@@ -81,7 +81,7 @@ def batch_process_iter(dataset, offset, batch_size, processor):
     return time.time() - start
 
 
-def batch_process(dataset, processor, max_workers=1, batch_size=200, limit=-1):
+def batch_process(dataset, processor, max_workers=1, batch_size=150, limit=-1):
     iterations = math.ceil(len(dataset) / 200)
     if limit >= 0:
         iterations = min(limit, iterations)
