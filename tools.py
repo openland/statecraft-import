@@ -15,6 +15,9 @@ SERVER = "prod"
 if 'UPLOAD_SERVER' in os.environ:
     SERVER = os.environ['UPLOAD_SERVER']
 
+class InvalidResponseError(Exception):
+    """Base class for exceptions in this module."""
+    pass
 
 def upload_permits(permits):
     initialized = getattr(SESSION_THREAD_LOCAL, 's', None)
@@ -51,14 +54,18 @@ def upload_permits(permits):
     data = json.dumps(container)
     response = SESSION_THREAD_LOCAL.s.post(
         url, data=data, headers=headers, stream=False)
-    rdata = json.loads(response.text)
-    if rdata['data']['updatePermits'] != 'ok':
+    try:
+        rdata = json.loads(response.text)
+        if rdata['data']['updatePermits'] != 'ok':
+            raise InvalidResponseError("Wrong response!")
+    except BaseException as e:
         print("Wrong Response!")
         print("Sent:")
         print(data)
         print("Got:")
         print(response.text)
-        raise Exception("Wrong response!")
+        raise e
+
     #    print(r.text)
     end = time.time()
     return end - start
