@@ -10,8 +10,8 @@ print("Loading Permits...")
 BUILDING_PERMITS = pd.read_csv(
     "downloads/Building_Permits.csv",
     sep=',',
-    infer_datetime_format=True,
-    parse_dates=['Permit Creation Date', 'Current Status Date', 'Issued Date', 'Completed Date'],
+    # infer_datetime_format=True,
+    # parse_dates=['Permit Creation Date', 'Current Status Date', 'Issued Date', 'Completed Date'],
     dtype={
         'Permit Number': str
     })
