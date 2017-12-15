@@ -6,6 +6,7 @@ import requests
 import math
 import os
 import pandas as pd
+import numpy as np
 
 SESSION_THREAD_LOCAL = threading.local()
 
@@ -15,9 +16,11 @@ SERVER = "prod"
 if 'UPLOAD_SERVER' in os.environ:
     SERVER = os.environ['UPLOAD_SERVER']
 
+
 class InvalidResponseError(Exception):
     """Base class for exceptions in this module."""
     pass
+
 
 def upload_permits(permits):
     initialized = getattr(SESSION_THREAD_LOCAL, 's', None)
@@ -140,7 +143,7 @@ def validate_date_read(src):
 
 def validate_date_write(src):
     if src is not None:
-        if src.dt.date is not None:
+        if not np.isnat(src):
             return src.strftime('%Y-%m-%d')
     return None
 
