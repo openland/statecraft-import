@@ -57,6 +57,7 @@ def upload_batch(batch: tools.BatchBuilder):
         batch.copy_string('Permit Number', 'id')
         batch.copy_string('Description', 'description')
         batch.copy_string('Proposed Use', 'proposedUse')
+        batch.copy_date('Permit Creation Date', 'createdAt')
 
         # Street Info
         streetName = batch.read_string('Street Name')
