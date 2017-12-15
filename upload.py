@@ -58,6 +58,8 @@ def upload_batch(batch: tools.BatchBuilder):
         batch.copy_string('Description', 'description')
         batch.copy_string('Proposed Use', 'proposedUse')
         batch.copy_date('Permit Creation Date', 'createdAt')
+        batch.copy_date('Issued Date', 'issuedAt')
+        batch.copy_date('Completed Date', 'completedAt')
 
         # Street Info
         streetName = batch.read_string('Street Name')
@@ -100,8 +102,8 @@ def upload_batch(batch: tools.BatchBuilder):
             batch.write_date('statusUpdatedAt', status_date)
             if (status == 'expired'):
                 batch.write_date('expiredAt', status_date)
-            elif (status == 'issued'):
-                batch.write_date('issuedAt', status_date)
+            # elif (status == 'issued'):
+            #     batch.write_date('issuedAt', status_date)
         else:
             print("Wrong Status: {}".format(status))
 
