@@ -140,7 +140,10 @@ def validate_int(src):
 def validate_date_read(src):
     if src is not None:
         if isinstance(src, str):
-            return pd.to_datetime(src)
+            try:
+                return pd.to_datetime(src)
+            except:
+                pass
         else:
             return src
     return None
@@ -149,10 +152,7 @@ def validate_date_read(src):
 def validate_date_write(src):
     if src is not None:
         if str(src) != 'NaT':
-            try:
-                return src.strftime('%Y-%m-%d')
-            except:
-                pass
+            return src.strftime('%Y-%m-%d')
     return None
 
 
