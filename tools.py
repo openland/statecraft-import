@@ -144,7 +144,10 @@ def validate_date_read(src):
 def validate_date_write(src):
     if src is not None:
         if str(src) != 'NaT':
-            return src.strftime('%Y-%m-%d')
+            try:
+                return src.strftime('%Y-%m-%d')
+            except:
+                pass
     return None
 
 
