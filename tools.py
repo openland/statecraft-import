@@ -80,7 +80,12 @@ def batch_process_iter(dataset, offset, batch_size, processor):
     for _, row in dataset.iloc[offset:offset + batch_size].iterrows():
         pending.append(row)
     if len(pending) > 0:
-        processor(BatchBuilder(pending))
+        try:
+            batcher = BatchBuilder(pending)
+            processor(batcher)
+        except:
+            print("Error at {}".format(batcher.read_value('Permit Number')))
+            raise
     return time.time() - start
 
 
