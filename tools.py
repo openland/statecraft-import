@@ -140,7 +140,7 @@ def validate_date_read(src):
 
 def validate_date_write(src):
     if src is not None:
-        return src.strftime('%Y-%m-%d')
+        return src.date.strftime('%Y-%m-%d')
     return None
 
 
