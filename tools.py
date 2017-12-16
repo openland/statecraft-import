@@ -84,7 +84,7 @@ def batch_process_iter(dataset, offset, batch_size, processor):
             batcher = BatchBuilder(pending)
             processor(batcher)
         except:
-            print("Error at {}".format(batcher.read_value('Permit Number')))
+            print("Error at {}".format(batcher.source[batcher.index]))
             raise
     return time.time() - start
 
@@ -145,7 +145,7 @@ def validate_date_read(src):
             except:
                 pass
         else:
-            return src
+            return None
     return None
 
 
