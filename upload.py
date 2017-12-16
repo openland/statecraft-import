@@ -60,6 +60,9 @@ def upload_batch(batch: tools.BatchBuilder):
         batch.copy_date('Permit Creation Date', 'createdAt')
         batch.copy_date('Issued Date', 'issuedAt')
         batch.copy_date('Completed Date', 'completedAt')
+        batch.copy_date('Filed Date', 'filedAt')
+        batch.copy_date('First Construction Document Date', 'startedAt')
+        batch.copy_date('Permit Expiration Date', 'expiresAt')
 
         # Street Info
         streetName = batch.read_string('Street Name')
@@ -94,16 +97,12 @@ def upload_batch(batch: tools.BatchBuilder):
 
         # Permit Status
         status = batch.read_string('Current Status')
-        # status_date = None
         status_date = batch.read_date('Current Status Date')
-        # print(type(status_date))
         if status in _status_map:
             batch.write_string('status', _status_map[status])
             batch.write_date('statusUpdatedAt', status_date)
             if (status == 'expired'):
                 batch.write_date('expiredAt', status_date)
-            # elif (status == 'issued'):
-            #     batch.write_date('issuedAt', status_date)
         else:
             print("Wrong Status: {}".format(status))
 
