@@ -43,7 +43,7 @@ def upload_permits(permits):
     }
     container = {
         "query":
-        "mutation($args: [PermitInfo]!) { updatePermits(permits: $args) }",
+        "mutation($args: [PermitInfo]!) { updatePermits(state: \"CA\", county: \"San Francisco\", city: \"San Francisco\", permits: $args) }",
         "variables": {
             "args": permits
         }
