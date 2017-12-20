@@ -10,10 +10,9 @@ import numpy as np
 
 SESSION_THREAD_LOCAL = threading.local()
 
-print("Env: {}".format(os.environ['UPLOAD_SERVER']))
-
 SERVER = "prod"
 if 'UPLOAD_SERVER' in os.environ:
+    print("Env: {}".format(os.environ['UPLOAD_SERVER']))
     SERVER = os.environ['UPLOAD_SERVER']
 
 
@@ -49,7 +48,7 @@ def upload_permits(permits):
     }
     container = {
         "query":
-        "mutation($args: [PermitInfo]!) { updatePermits(permits: $args) }",
+        "mutation($args: [PermitInfo]!) { updatePermits(state: \"CA\", county: \"San Francisco\", city: \"San Francisco\", permits: $args) }",
         "variables": {
             "args": permits
         }
