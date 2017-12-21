@@ -98,9 +98,7 @@ def upload_batch(batch: tools.BatchBuilder):
 
         # Permit Status
         status = batch.read_string('Status')
-        status_date = None
-        # status_date = batch.read_date('Status Date')
-        # print(type(status_date))
+        status_date = batch.read_date('Status Date')
         if status in _status_map:
             batch.write_string('status', _status_map[status])
             batch.write_date('statusUpdatedAt', status_date)
@@ -108,6 +106,8 @@ def upload_batch(batch: tools.BatchBuilder):
                 batch.write_date('expiredAt', status_date)
             elif (status == 'issued'):
                 batch.write_date('issuedAt', status_date)
+            elif (status == 'filed'):
+                batch.write_date('filedAt', status_date)
         else:
             print("Wrong Status: {}".format(status))
 
