@@ -9,10 +9,9 @@ import pandas as pd
 
 SESSION_THREAD_LOCAL = threading.local()
 
-print("Env: {}".format(os.environ['UPLOAD_SERVER']))
-
 SERVER = "prod"
 if 'UPLOAD_SERVER' in os.environ:
+    print("Env: {}".format(os.environ['UPLOAD_SERVER']))
     SERVER = os.environ['UPLOAD_SERVER']
 
 
