@@ -6,6 +6,7 @@ import requests
 import math
 import os
 import pandas as pd
+import numpy as np
 
 SESSION_THREAD_LOCAL = threading.local()
 
@@ -13,6 +14,11 @@ SERVER = "prod"
 if 'UPLOAD_SERVER' in os.environ:
     print("Env: {}".format(os.environ['UPLOAD_SERVER']))
     SERVER = os.environ['UPLOAD_SERVER']
+
+
+class InvalidResponseError(Exception):
+    """Base class for exceptions in this module."""
+    pass
 
 
 def upload_permits(permits):
@@ -50,14 +56,18 @@ def upload_permits(permits):
     data = json.dumps(container)
     response = SESSION_THREAD_LOCAL.s.post(
         url, data=data, headers=headers, stream=False)
-    rdata = json.loads(response.text)
-    if rdata['data']['updatePermits'] != 'ok':
+    try:
+        rdata = json.loads(response.text)
+        if rdata['data']['updatePermits'] != 'ok':
+            raise InvalidResponseError("Wrong response!")
+    except BaseException as e:
         print("Wrong Response!")
         print("Sent:")
         print(data)
         print("Got:")
         print(response.text)
-        raise Exception("Wrong response!")
+        raise e
+
     #    print(r.text)
     end = time.time()
     return end - start
@@ -69,12 +79,17 @@ def batch_process_iter(dataset, offset, batch_size, processor):
     for _, row in dataset.iloc[offset:offset + batch_size].iterrows():
         pending.append(row)
     if len(pending) > 0:
-        processor(BatchBuilder(pending))
+        try:
+            batcher = BatchBuilder(pending)
+            processor(batcher)
+        except:
+            print("Error at {}".format(batcher.source[batcher.index]))
+            raise
     return time.time() - start
 
 
-def batch_process(dataset, processor, max_workers=1, batch_size=200, limit=-1):
-    iterations = math.ceil(len(dataset) / 200)
+def batch_process(dataset, processor, max_workers=1, batch_size=150, limit=-1):
+    iterations = math.ceil(len(dataset) / batch_size)
     if limit >= 0:
         iterations = min(limit, iterations)
     start = time.time()
@@ -124,15 +139,19 @@ def validate_int(src):
 def validate_date_read(src):
     if src is not None:
         if isinstance(src, str):
-            return pd.to_datetime(src)
+            try:
+                return pd.to_datetime(src)
+            except:
+                pass
         else:
-            return src
+            return None
     return None
 
 
 def validate_date_write(src):
     if src is not None:
-        return src.strftime('%Y-%m-%d')
+        if str(src) != 'NaT':
+            return src.strftime('%Y-%m-%d')
     return None
 
 

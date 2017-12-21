@@ -8,11 +8,7 @@ import tools
 
 print("Loading Permits...")
 BUILDING_PERMITS = pd.read_csv(
-    "downloads/Building_Permits.csv",
-    sep=',',
-    infer_datetime_format=True,
-    parse_dates=['Permit Creation Date', 'Status Date'],
-    dtype={
+    "downloads/Building_Permits.csv", sep=',', dtype={
         'Permit Number': str
     })
 
@@ -57,6 +53,7 @@ def upload_batch(batch: tools.BatchBuilder):
         batch.copy_string('Permit Number', 'id')
         batch.copy_string('Description', 'description')
         batch.copy_string('Proposed Use', 'proposedUse')
+        batch.copy_date('Permit Creation Date', 'createdAt')
 
         # Street Info
         streetName = batch.read_string('Street Name')
