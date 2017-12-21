@@ -63,6 +63,8 @@ def upload_batch(batch: tools.BatchBuilder):
         streetNameSuffix = batch.read_string('Street Suffix')
         streetNumber = batch.read_int('Street Number')
         streetNumberSuffix = batch.read_string('Street Number Suffix')
+        if streetNameSuffix == 'Ave':
+            streetNameSuffix = 'Av'
         if streetNumber is not None and streetName is not None:
             street = {
                 "streetName": streetName,
