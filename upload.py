@@ -67,6 +67,8 @@ def upload_batch(batch: tools.BatchBuilder):
             streetNameSuffix = 'Av'
         if streetNameSuffix == 'Blvd':
             streetNameSuffix = 'Bl'
+        if streetNameSuffix == 'Ter':
+            streetNameSuffix = 'Tr'
         if streetNumber is not None and streetName is not None:
             street = {
                 "streetName": streetName,
