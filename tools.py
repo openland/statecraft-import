@@ -21,7 +21,7 @@ class InvalidResponseError(Exception):
     pass
 
 
-def upload_permits(permits):
+def upload_permits(date, permits):
     initialized = getattr(SESSION_THREAD_LOCAL, 's', None)
     if initialized is None:
         SESSION_THREAD_LOCAL.s = requests.Session()
@@ -48,9 +48,10 @@ def upload_permits(permits):
     }
     container = {
         "query":
-        "mutation($args: [PermitInfo]!) { updatePermits(state: \"CA\", county: \"San Francisco\", city: \"San Francisco\", permits: $args) }",
+        "mutation($args: [PermitInfo]!) { updatePermits(state: \"CA\", county: \"San Francisco\", city: \"San Francisco\", sourceDate: $date, permits: $args) }",
         "variables": {
-            "args": permits
+            "permits": permits
+            "date": date
         }
     }
     data = json.dumps(container)

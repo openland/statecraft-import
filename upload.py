@@ -111,7 +111,7 @@ def upload_batch(batch: tools.BatchBuilder):
         else:
             print("Wrong Status: {}".format(status))
 
-    tools.upload_permits(batch.data)
+    tools.upload_permits(batch.data, "2017-08-02")
 
 
 tools.batch_process(BUILDING_PERMITS, upload_batch, max_workers=1)
