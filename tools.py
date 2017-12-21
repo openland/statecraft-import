@@ -50,7 +50,7 @@ def upload_permits(date, permits):
         "query":
         "mutation($args: [PermitInfo]!) { updatePermits(state: \"CA\", county: \"San Francisco\", city: \"San Francisco\", sourceDate: $date, permits: $args) }",
         "variables": {
-            "permits": permits
+            "permits": permits,
             "date": date
         }
     }
