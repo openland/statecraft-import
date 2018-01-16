@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 apt-get update -y
 apt-get install -y python3 wget curl python3-pip
