@@ -7,6 +7,12 @@ import math
 import tools
 
 print("Loading Permits...")
+
+with open('downloads/CURRENT', 'r') as currentFile:
+    DATE = currentFile.read().replace('\n', '')
+
+print("Permits Date: {}".format(DATE))
+
 BUILDING_PERMITS = pd.read_csv(
     "downloads/Building_Permits.csv",
     sep=',',
@@ -106,7 +112,7 @@ def upload_batch(batch: tools.BatchBuilder):
         else:
             print("Wrong Status: {}".format(status))
 
-    tools.upload_permits(batch.data, "2018-01-06")
+    tools.upload_permits(batch.data, DATE)
 
 
 tools.batch_process(BUILDING_PERMITS, upload_batch, max_workers=1)
