@@ -21,7 +21,7 @@ class InvalidResponseError(Exception):
     pass
 
 
-def upload_permits(permits, date):
+def upload_query(query, variables, key):
     initialized = getattr(SESSION_THREAD_LOCAL, 's', None)
     if initialized is None:
         SESSION_THREAD_LOCAL.s = requests.Session()
@@ -46,20 +46,13 @@ def upload_permits(permits, date):
         'x-statecraft-domain': domain,
         'Content-Type': 'application/json'
     }
-    container = {
-        "query":
-        "mutation($permits: [PermitInfo]!, $date: String!) { updatePermits(state: \"CA\", county: \"San Francisco\", city: \"San Francisco\", sourceDate: $date, permits: $permits) }",
-        "variables": {
-            "permits": permits,
-            "date": date
-        }
-    }
+    container = {"query": query, "variables": variables}
     data = json.dumps(container)
     response = SESSION_THREAD_LOCAL.s.post(
         url, data=data, headers=headers, stream=False)
     try:
         rdata = json.loads(response.text)
-        if rdata['data']['updatePermits'] != 'ok':
+        if rdata['data'][key] != 'ok':
             raise InvalidResponseError("Wrong response!")
     except BaseException as e:
         print("Wrong Response!")
@@ -72,6 +65,18 @@ def upload_permits(permits, date):
     #    print(r.text)
     end = time.time()
     return end - start
+
+
+def upload_parcels(parcels):
+    query = "mutation($parcels: [ParcelInput!]!) { importParcels(state: \"CA\", county: \"San Francisco\", city: \"San Francisco\", parcels: $parcels) }"
+    variables = {"parcels": parcels}
+    return upload_query(query, variables, 'importParcels')
+
+
+def upload_permits(permits, date):
+    query = "mutation($permits: [PermitInfo]!, $date: String!) { updatePermits(state: \"CA\", county: \"San Francisco\", city: \"San Francisco\", sourceDate: $date, permits: $permits) }"
+    variables = {"permits": permits, "date": date}
+    return upload_query(query, variables, 'updatePermits')
 
 
 def batch_process_iter(dataset, offset, batch_size, processor):
