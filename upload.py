@@ -16,10 +16,16 @@ PARCELS = pd.read_csv(
         'blklot': str,
         'geometry': str,
         'block_num': str,
-        'lot_num': str
+        'lot_num': str,
+        'mapblklot': str
     })
 
 print("Uploading Parcels...")
+print("Count {}".format(len(PARCELS)))
+PARCELS = PARCELS[PARCELS['geometry'].notnull()]
+print("Count {}".format(len(PARCELS)))
+PARCELS = PARCELS[PARCELS['blklot'] == PARCELS['mapblklot']]
+print("Count {}".format(len(PARCELS)))
 
 def upload_batch(batch: tools.BatchBuilder):
     while batch.next_record():
