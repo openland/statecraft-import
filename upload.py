@@ -9,6 +9,8 @@ import geojson
 import shapely.wkt
 from shapely.ops import cascaded_union
 
+# tools.SERVER = "local"
+
 print("Loading Parcels...")
 PARCELS = pd.read_csv(
     "downloads/Parcels.csv",
@@ -44,7 +46,7 @@ def upload_batch(batch: tools.BatchBuilder):
         if block_num not in BLOCKS:
             BLOCKS[block_num] = []
         if geo is not None:
-            g1 = shapely.wkt.loads(geo)
+            g1 = shapely.wkt.loads(geo).simplify(0.00001, preserve_topology=False)
             BLOCKS[block_num].append(g1)
             g2 = geojson.Feature(geometry=g1, properties={})
             geo = g2.geometry['coordinates']
@@ -60,7 +62,7 @@ def upload_batch(batch: tools.BatchBuilder):
         if large:
             d = batch.reset_data()
             if len(d) > 0:
-                tools.upload_parcels(d)
+               tools.upload_parcels(d)
 
         batch.copy_string('block_num', 'blockId')
         batch.copy_string('lot_num', 'lotId')
@@ -69,14 +71,16 @@ def upload_batch(batch: tools.BatchBuilder):
         if large:
             d = batch.reset_data()
             if len(d) > 0:
-               tools.upload_parcels(d)
+              tools.upload_parcels(d)
 
     tools.upload_parcels(batch.data)
 
 tools.batch_process(PARCELS, upload_batch, batch_size=50, max_workers=1)
 
 for key in BLOCKS.keys():
-    converted = geojson.Feature(geometry=cascaded_union(BLOCKS[key]), properties={}).geometry
+    united = cascaded_union(BLOCKS[key])
+    simplified = united.simplify(0.00001, preserve_topology=False)
+    converted = geojson.Feature(geometry=simplified, properties={}).geometry
     geo_converted = []
     print(converted.type)
     if converted.type == "MultiPolygon":
