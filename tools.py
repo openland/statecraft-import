@@ -72,6 +72,10 @@ def upload_parcels(parcels):
     variables = {"parcels": parcels}
     return upload_query(query, variables, 'importParcels')
 
+def upload_blocks(blocks):
+    query = "mutation($blocks: [BlockInput!]!) { importBlocks(state: \"CA\", county: \"San Francisco\", city: \"San Francisco\", blocks: $blocks) }"
+    variables = {"blocks": blocks}
+    return upload_query(query, variables, 'importBlocks')
 
 def upload_permits(permits, date):
     query = "mutation($permits: [PermitInfo]!, $date: String!) { updatePermits(state: \"CA\", county: \"San Francisco\", city: \"San Francisco\", sourceDate: $date, permits: $permits) }"

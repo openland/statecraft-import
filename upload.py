@@ -7,6 +7,7 @@ import math
 import tools
 import geojson
 import shapely.wkt
+from shapely.ops import cascaded_union
 
 print("Loading Parcels...")
 PARCELS = pd.read_csv(
@@ -40,8 +41,11 @@ def upload_batch(batch: tools.BatchBuilder):
         geo = batch.read_string('geometry')
         geo_converted = []
         large = False
+        if block_num not in BLOCKS:
+            BLOCKS[block_num] = []
         if geo is not None:
             g1 = shapely.wkt.loads(geo)
+            BLOCKS[block_num].append(g1)
             g2 = geojson.Feature(geometry=g1, properties={})
             geo = g2.geometry['coordinates']
             for coordinate in geo:
@@ -52,9 +56,6 @@ def upload_batch(batch: tools.BatchBuilder):
                     arr.append({'la': coordinate2[1],'lo': coordinate2[0]})
                 geo_converted.append(arr)
 
-        if block_num not in BLOCKS:
-            BLOCKS[block_num] = []
-        BLOCKS[block_num].append(geo_converted)
         
         if large:
             d = batch.reset_data()
@@ -68,9 +69,28 @@ def upload_batch(batch: tools.BatchBuilder):
         if large:
             d = batch.reset_data()
             if len(d) > 0:
-                tools.upload_parcels(d)
+               tools.upload_parcels(d)
 
     tools.upload_parcels(batch.data)
 
-
 tools.batch_process(PARCELS, upload_batch, batch_size=50, max_workers=1)
+
+for key in BLOCKS.keys():
+    converted = geojson.Feature(geometry=cascaded_union(BLOCKS[key]), properties={}).geometry
+    geo_converted = []
+    print(converted.type)
+    if converted.type == "MultiPolygon":
+        for poly in converted.coordinates:
+            for coordinate in poly:
+                arr = []
+                for coordinate2 in coordinate:
+                    arr.append({ 'la' : coordinate2[1], 'lo' : coordinate2[0]})
+                geo_converted.append(arr)
+    if converted.type == "Polygon":
+        for coordinate in converted.coordinates:
+            arr = []
+            for coordinate2 in coordinate:
+                arr.append({ 'la' : coordinate2[1], 'lo' : coordinate2[0]})
+            geo_converted.append(arr)
+
+    tools.upload_blocks({'blockId': key, 'geometry': geo_converted})
