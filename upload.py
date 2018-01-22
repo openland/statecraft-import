@@ -46,7 +46,7 @@ def upload_batch(batch: tools.BatchBuilder):
         if block_num not in BLOCKS:
             BLOCKS[block_num] = []
         if geo is not None:
-            g1 = shapely.wkt.loads(geo).simplify(0.00001, preserve_topology=False)
+            g1 = shapely.wkt.loads(geo).simplify(0.00001, preserve_topology=True)
             BLOCKS[block_num].append(g1)
             g2 = geojson.Feature(geometry=g1, properties={})
             geo = g2.geometry['coordinates']
