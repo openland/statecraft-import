@@ -167,6 +167,7 @@ class BatchBuilder:
         self.index = -1
         self.current_row = {}
         self.data = []
+        self.was_set = False
 
     def read_string(self, src):
         return validate_string(self.source[self.index][src])
@@ -200,10 +201,22 @@ class BatchBuilder:
 
     def write_value(self, dst, value):
         self.current_row[dst] = value
+        self.was_set = True
 
     def next_record(self):
         if self.index >= 0:
-            self.data.append(self.current_row)
+            if self.was_set:
+                self.data.append(self.current_row)
+                self.was_set = False
             self.current_row = {}
         self.index += 1
         return self.index < len(self.source)
+
+    def reset_data(self):
+        if self.was_set:
+            self.data.append(self.current_row)
+            self.current_row = {}
+            self.was_set = False
+        res = self.data
+        self.data = []
+        return res
