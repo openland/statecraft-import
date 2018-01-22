@@ -25,10 +25,12 @@ print("Uploading Parcels...")
 print("Count {}".format(len(PARCELS)))
 PARCELS = PARCELS[PARCELS['geometry'].notnull()]
 PARCELS = PARCELS[PARCELS['datemap_dr'].isnull()]
-PARCELS = PARCELS[PARCELS['blklot'] == '0700035']
+PARCELS = PARCELS[PARCELS['blklot'] != '0700035']
 print("Count {}".format(len(PARCELS)))
 PARCELS = PARCELS[PARCELS['blklot'] == PARCELS['mapblklot']]
 print("Count {}".format(len(PARCELS)))
+
+BLOCKS = {}
 
 def upload_batch(batch: tools.BatchBuilder):
     while batch.next_record():
@@ -49,6 +51,10 @@ def upload_batch(batch: tools.BatchBuilder):
                 for coordinate2 in coordinate:
                     arr.append({'la': coordinate2[1],'lo': coordinate2[0]})
                 geo_converted.append(arr)
+
+        if block_num not in BLOCKS:
+            BLOCKS[block_num] = []
+        BLOCKS[block_num].append(geo_converted)
         
         if large:
             d = batch.reset_data()
