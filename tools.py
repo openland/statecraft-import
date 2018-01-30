@@ -28,7 +28,7 @@ def upload_permits(permits, date):
     start = time.time()
     domain = "sf"
     staging_url = "https://statecraft-api-staging.herokuapp.com/api"
-    production_url = "https://statecraft-api.herokuapp.com/api"
+    production_url = "https://api.statecrafthq.com/api"
     local_url = "http://localhost:9000/api"
     local_docker_url = "http://docker.for.mac.localhost:9000/api"
 
