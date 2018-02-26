@@ -90,6 +90,9 @@ def upload_batch(batch: tools.BatchBuilder):
         batch.copy_int('Existing Units', 'existingUnits')
         batch.copy_int('Proposed Units', 'proposedUnits')
 
+        # Parcel Id
+        batch.write_string('parcelId', batch.read_string('Block') + batch.read_string('Lot'))
+
         # Permit Type
         permit_type = batch.read_int('Permit Type')
         if permit_type in _permit_type_map:

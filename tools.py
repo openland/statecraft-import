@@ -75,7 +75,7 @@ def upload_permits(permits, date):
             print(data)
             print("Got:")
             print(response.text)
-            raise e
+            # raise e
 
     #    print(r.text)
     end = time.time()
