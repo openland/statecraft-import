@@ -54,20 +54,28 @@ def upload_permits(permits, date):
             "date": date
         }
     }
-    data = json.dumps(container)
-    response = SESSION_THREAD_LOCAL.s.post(
-        url, data=data, headers=headers, stream=False)
-    try:
-        rdata = json.loads(response.text)
-        if rdata['data']['updatePermits'] != 'ok':
-            raise InvalidResponseError("Wrong response!")
-    except BaseException as e:
-        print("Wrong Response!")
-        print("Sent:")
-        print(data)
-        print("Got:")
-        print(response.text)
-        raise e
+    while True:
+        try:
+            data = json.dumps(container)
+            response = SESSION_THREAD_LOCAL.s.post(url, data=data, headers=headers, stream=False)
+            rdata = json.loads(response.text)
+            if 'errors' in rdata:
+                raise InvalidResponseError("Wrong response!")
+            break
+        except InvalidResponseError as e:
+            print("Wrong Response!")
+            print("Sent:")
+            print(data)
+            print("Got:")
+            print(response.text)
+            break
+        except BaseException as e:
+            print("Wrong Response!")
+            print("Sent:")
+            print(data)
+            print("Got:")
+            print(response.text)
+            raise e
 
     #    print(r.text)
     end = time.time()
